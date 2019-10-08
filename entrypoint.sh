@@ -45,7 +45,7 @@ function main() {
 
 function sanitize() {
   if [ -z "${1}" ]; then
-    >&2 echo "Unable to find the ${2}. Did you set with.${2}?"
+    echo >&2 "Unable to find the ${2}. Did you set with.${2}?"
     exit 1
   fi
 }
@@ -67,7 +67,7 @@ function translateDockerTag() {
     TAG="${GITHUB_SHA}"
   else
     TAG="${BRANCH}"
-  fi;
+  fi
 }
 
 function hasCustomTag() {
@@ -112,7 +112,7 @@ function uses() {
 }
 
 function pushWithSnapshot() {
-  local TIMESTAMP=`date +%Y%m%d%H%M%S`
+  local TIMESTAMP=$(date +%Y%m%d%H%M%S)
   local SHORT_SHA=$(echo "${GITHUB_SHA}" | cut -c1-6)
   local SNAPSHOT_TAG="${TIMESTAMP}${SHORT_SHA}"
   local SHA_DOCKER_NAME="${INPUT_NAME}:${SNAPSHOT_TAG}"
@@ -125,6 +125,13 @@ function pushWithSnapshot() {
 function pushWithoutSnapshot() {
   docker build $BUILDPARAMS -t ${DOCKERNAME} .
   docker push ${DOCKERNAME}
+
+  if isGitTag; then
+    DOCKER_TAG=${GITHUB_REF/refs\/tags\//}
+    echo ::set-output name=docker-tag::"${DOCKER_TAG}"
+    docker tag ${DOCKERNAME} ${INPUT_NAME}:${DOCKER_TAG}
+    docker push ${INPUT_NAME}:${DOCKER_TAG}
+  fi
 }
 
 main

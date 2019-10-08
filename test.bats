@@ -71,6 +71,9 @@ Called /usr/local/bin/docker logout"
 Called /usr/local/bin/docker login -u USERNAME --password-stdin
 Called /usr/local/bin/docker build -t my/repository:latest .
 Called /usr/local/bin/docker push my/repository:latest
+::set-output name=docker-tag::myRelease
+Called /usr/local/bin/docker tag my/repository:latest my/repository:myRelease
+Called /usr/local/bin/docker push my/repository:myRelease
 ::set-output name=tag::latest
 Called /usr/local/bin/docker logout"
   echo $output
